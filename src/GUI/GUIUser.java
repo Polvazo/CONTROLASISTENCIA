@@ -5,6 +5,7 @@
  */
 package GUI;
 
+import Entity.Area;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -15,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.joda.time.DateTime;
@@ -269,10 +271,14 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
             if (jdbcPersonDAO.userExiste(Integer.parseInt(et_Dni.getText()))) {
 
                 if (jdbcPersonDAO.registerSalida(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText()))) == false) {
+                    System.out.print(jdbcPersonDAO.horarioInicial(4));
+                    System.out.print(jdbcPersonDAO.horarioFinal(4));
                     Registro registro = new Registro();
-                    String horarioTrabajo = jdbcPersonDAO.horarioInicial();
+                    String horarioTrabajo = jdbcPersonDAO.horarioInicial(4);
+                                      //System.out.print("hora entrada" + jdbcPersonDAO.horarioInicial(4));
+                    //DateTime HorarioTra = horarioTrabajo.getHoraEntrada();
                     DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
-                    // String horaTrabajo = "08:00:00"; //hora de entrada
+                    //String horaTrabajo = "08:00:00"; //hora de entrada
 
                     //String tolerancia = "08:15:00"; //hora de torelancia
                     Date dateActual = new Date();

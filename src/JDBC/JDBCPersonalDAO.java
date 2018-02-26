@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import Entity.Registro;
+import Entity.Area;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -18,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.joda.time.DateTime;
 import static org.joda.time.format.ISODateTimeFormat.date;
 
 public class JDBCPersonalDAO implements PersonalDAO {
@@ -110,16 +112,17 @@ public class JDBCPersonalDAO implements PersonalDAO {
     }
 
     @Override
-    public String horarioInicial() {
+    public String horarioInicial(Integer idPersonal) {
         String returnData = null;
-        String QUERY = "select HoraEntrada, HoraSalida from bdproyectomate.area right outer join bdproyectomate.personal ON personal.Area_idArea=area.idArea;";
+        String QUERY = "select HoraEntrada from bdproyectomate.area right outer join bdproyectomate.personal ON personal.Area_idArea=area.idArea where personal.idPersonal=?;";
         Personal person = new Personal();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
-
+            preparedStatement.setInt(1, idPersonal);
             ResultSet rs = preparedStatement.executeQuery();
-            while (rs.next()) {
+            if (rs.last()) {
                 returnData = rs.getString("HoraEntrada");
+                System.out.print(returnData);
             }
 
             preparedStatement.close();
@@ -129,6 +132,32 @@ public class JDBCPersonalDAO implements PersonalDAO {
         }
 
         return returnData;
+
+    }
+
+    @Override
+    public String horarioFinal(Integer idPersonal) {
+        String returnData = null;
+        String horaFinal = null;
+        String QUERY = "select HoraSalida from bdproyectomate.area right outer join bdproyectomate.personal ON personal.Area_idArea=area.idArea where personal.idPersonal=?;";
+        Personal person = new Personal();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
+            preparedStatement.setInt(1, idPersonal);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.last()) {
+                returnData = rs.getString("HoraSalida");
+               
+            }
+
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return returnData;
+
     }
 
     @Override
@@ -138,7 +167,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
         String idRegistro = "SELECT idRegistro from registro where Personal_idPersonal=? and validacion=1";
         String UPDATE = "UPDATE registro SET validacion=2 WHERE idRegistro=?";
         Boolean existe = false;
-        Integer idRegistroNumber=null;
+        Integer idRegistroNumber = null;
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
             preparedStatement.setInt(1, idpersonal);
@@ -159,18 +188,18 @@ public class JDBCPersonalDAO implements PersonalDAO {
                 PreparedStatement preparedStatement2 = connection.prepareStatement(UPDATE);
                 preparedStatement2.setInt(1, idRegistroNumber);
                 preparedStatement2.executeUpdate();
-                
+
                 rs1.close();
                 preparedStatement1.close();
-                
+
                 preparedStatement2.close();
-            } 
+            }
             rs.close();
             preparedStatement.close();
 
         } catch (SQLException e) {
             System.out.print("paso por aca");
-            e.printStackTrace();
+            System.out.print("LA HORA NO PUEDE SER 24 DE LA NOCHE");
         }
         return existe;
 
