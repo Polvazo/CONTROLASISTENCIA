@@ -10,7 +10,7 @@ public interface PersonalDAO {
   public Integer select(Integer dni);
   public void Salida(Registro registro);
   public String horarioInicial();
-  public List<Registro> registerSalida (Integer idpersonal);
+  public Boolean registerSalida (Integer idpersonal);
   public Boolean userExiste(Integer dni);
     
 }

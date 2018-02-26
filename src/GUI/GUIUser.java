@@ -248,66 +248,70 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
     }
 
     public void Registrar() {
-        
+
         JDBCPersonalDAO jdbcPersonDAO = new JDBCPersonalDAO();
         jdbcPersonDAO.getConnection();
         try {
-           
-            //System.out.println(jdbcPersonDAO.userExiste(Integer.parseInt(et_Dni.getText())));
-            if( jdbcPersonDAO.userExiste(Integer.parseInt(et_Dni.getText()))){
-            Registro registro = new Registro();
-            String horarioTrabajo = jdbcPersonDAO.horarioInicial();
-            DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
-            // String horaTrabajo = "08:00:00"; //hora de entrada
 
-            //String tolerancia = "08:15:00"; //hora de torelancia
-            Date dateActual = new Date();
-            Date dateActual2, toleranciaDate;
-            DateFormat hourFormat = new SimpleDateFormat("HH:mm:ss"); //hora actual
-            //dateActual = hourFormat.parse(horaTrabajo);
-            //toleranciaDate = hourFormat.parse(tolerancia);
-            String horaActual = hourFormat.format(dateActual);
-            //dateActual2 = hourFormat.parse(horaActual);
+            if (jdbcPersonDAO.userExiste(Integer.parseInt(et_Dni.getText()))) {
 
-            DateTime horaTrabajo = df.parseLocalTime(horarioTrabajo).toDateTimeToday();
-            DateTime Tolerancia = df.parseLocalTime(horarioTrabajo).toDateTimeToday().plusHours(1);
+                if (jdbcPersonDAO.registerSalida(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText()))) == false) {
+                    Registro registro = new Registro();
+                    String horarioTrabajo = jdbcPersonDAO.horarioInicial();
+                    DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+                    // String horaTrabajo = "08:00:00"; //hora de entrada
 
-            System.out.println(horaTrabajo);
-            
-            System.out.println(jdbcPersonDAO.registerSalida(Integer.parseInt(et_Dni.getText())));
-            
-            DateTime actual = df.parseLocalTime(horaActual).toDateTimeToday();
-            System.out.println(Tolerancia);
-            System.out.println(actual);
-            
-            Calendar calendar = Calendar.getInstance();
-            System.out.println(calendar.getTime().getTime());
-            java.sql.Timestamp nuestroJavaTimestampObject = new java.sql.Timestamp(calendar.getTime().getTime());
-            registro.setHoraRegistroIn(nuestroJavaTimestampObject);
-            registro.setPersonal_idPersonal(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
-            if (actual.isBefore(horaTrabajo)) {
-                System.out.println("Llego temprano");
-                registro.setEstado("ASISTIÓ");
-            } else {
-                if (!actual.isBefore(horaTrabajo) && actual.isBefore(Tolerancia)) {
-                    System.out.println("Tardanza");
-                    registro.setEstado("TARDANZA");     
+                    //String tolerancia = "08:15:00"; //hora de torelancia
+                    Date dateActual = new Date();
+                    Date dateActual2, toleranciaDate;
+                    DateFormat hourFormat = new SimpleDateFormat("HH:mm:ss"); //hora actual
+                    //dateActual = hourFormat.parse(horaTrabajo);
+                    //toleranciaDate = hourFormat.parse(tolerancia);
+                    String horaActual = hourFormat.format(dateActual);
+                    //dateActual2 = hourFormat.parse(horaActual);
+
+                    DateTime horaTrabajo = df.parseLocalTime(horarioTrabajo).toDateTimeToday();
+                    DateTime Tolerancia = df.parseLocalTime(horarioTrabajo).toDateTimeToday().plusHours(1);
+
+                    System.out.println(horaTrabajo);
+
+                    System.out.println(jdbcPersonDAO.registerSalida(Integer.parseInt(et_Dni.getText())));
+
+                    DateTime actual = df.parseLocalTime(horaActual).toDateTimeToday();
+                    System.out.println(Tolerancia);
+                    System.out.println(actual);
+
+                    Calendar calendar = Calendar.getInstance();
+                    System.out.println(calendar.getTime().getTime());
+                    java.sql.Timestamp nuestroJavaTimestampObject = new java.sql.Timestamp(calendar.getTime().getTime());
+                    registro.setHoraRegistroIn(nuestroJavaTimestampObject);
+                    registro.setPersonal_idPersonal(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                    if (actual.isBefore(horaTrabajo)) {
+                        System.out.println("Llego temprano");
+                        registro.setEstado("ASISTIÓ");
+                    } else {
+                        if (!actual.isBefore(horaTrabajo) && actual.isBefore(Tolerancia)) {
+                            System.out.println("Tardanza");
+                            registro.setEstado("TARDANZA");
+                        } else {
+                            System.out.println("FALTA");
+                            registro.setEstado("FALTA");
+                        }
+                    }
+
+                    jdbcPersonDAO.insert(registro);
+                    jdbcPersonDAO.closeConnection();
+                    et_Dni.setText("");
                 } else {
-                     System.out.println("FALTA");
-                    registro.setEstado("FALTA");
+                    et_Dni.setText("");
                 }
+
+            } else {
+                System.out.println("no existe");
+                jdbcPersonDAO.closeConnection();
             }
-            
-            jdbcPersonDAO.insert(registro);
-            jdbcPersonDAO.closeConnection();
-            et_Dni.setText("");
-        }else{
-            System.out.println("no existe");
-            jdbcPersonDAO.closeConnection();
-            }
-        
-        }
-        catch (Exception e) {
+
+        } catch (Exception e) {
         }
 
     }
@@ -336,6 +340,10 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
         Thread ct = Thread.currentThread();
         while (ct == h1) {
             Calcular();
+            if(minutos.equals("51")){
+                System.out.print(minutos);
+            }
+            System.out.print(hora);
             lbhora.setText(hora + ":" + minutos + ":" + segundos + " " + amp);
             lbFecha.setText(day + "-" + mes + "-" + year);
             try {

@@ -132,36 +132,47 @@ public class JDBCPersonalDAO implements PersonalDAO {
     }
 
     @Override
-    public List<Registro> registerSalida(Integer idpersonal) {
+    public Boolean registerSalida(Integer idpersonal) {
 
-        String QUERY = "select Personal_idPersonal, HoraRegistroIn,IFNULL(validacion,'no validacion') AS estado from registro where Personal_idPersonal=? and validacion=1";
-        List<Registro> personal = new LinkedList<Registro>();
-        DateFormat formatter;
-        formatter = new SimpleDateFormat("yyyy-MM-dd");
-
+        String QUERY = "select validacion from registro WHERE Personal_idPersonal=? and validacion=1";
+        String idRegistro = "SELECT idRegistro from registro where Personal_idPersonal=? and validacion=1";
+        String UPDATE = "UPDATE registro SET validacion=2 WHERE idRegistro=?";
+        Boolean existe = false;
+        Integer idRegistroNumber=null;
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
             preparedStatement.setInt(1, idpersonal);
+
             ResultSet rs = preparedStatement.executeQuery();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Registro registro = null;
-            while (rs.next()) {
-                registro = new Registro();
-                Date date = (Date) formatter.parse("HoraRegistroIn");
-                Timestamp time = new Timestamp(date.getTime());
-                registro.setHoraRegistroIn(time);
-                registro.setValidacion(Integer.parseInt(rs.getString("estado")));
-                personal.add(registro);
-            }
+            if (rs.last()) {
+                //System.out.print("esto es " +Boolean.parseBoolean(rs.getString("idPersonal")));
+                //existe = Boolean.parseBoolean(rs.getString("idPersonal"));
+                existe = true;
+                System.out.print("paso por aca");
+                PreparedStatement preparedStatement1 = connection.prepareStatement(idRegistro);
+                preparedStatement1.setInt(1, idpersonal);
+                ResultSet rs1 = preparedStatement1.executeQuery();
+                while (rs1.next()) {
+                    idRegistroNumber = Integer.parseInt(rs1.getString("idRegistro"));
+                }
+                System.out.print(idRegistroNumber);
+                PreparedStatement preparedStatement2 = connection.prepareStatement(UPDATE);
+                preparedStatement2.setInt(1, idRegistroNumber);
+                preparedStatement2.executeUpdate();
+                
+                rs1.close();
+                preparedStatement1.close();
+                
+                preparedStatement2.close();
+            } 
             rs.close();
             preparedStatement.close();
 
         } catch (SQLException e) {
+            System.out.print("paso por aca");
             e.printStackTrace();
-        } catch (ParseException ex) {
-            Logger.getLogger(JDBCPersonalDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return personal;
+        return existe;
 
     }
 
@@ -179,7 +190,10 @@ public class JDBCPersonalDAO implements PersonalDAO {
                 //System.out.print("esto es " +Boolean.parseBoolean(rs.getString("idPersonal")));
                 //existe = Boolean.parseBoolean(rs.getString("idPersonal"));
                 existe = true;
+            } else {
+
             }
+            rs.close();
             preparedStatement.close();
 
         } catch (SQLException e) {
