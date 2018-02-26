@@ -217,14 +217,14 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
     private void et_DniKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_et_DniKeyTyped
 
         char enter = evt.getKeyChar();
-        if (!(Character.isDigit(enter)) || et_Dni.getText().length()>=8) {
+        if (!(Character.isDigit(enter)) || et_Dni.getText().length() >= 8) {
             evt.consume();
         }        // TODO add your handling code here:
     }//GEN-LAST:event_et_DniKeyTyped
 
     private void btn_ingresarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btn_ingresarKeyPressed
-        
-       /* if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+
+        /* if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             System.out.println("se presiono la tecla Enter");
             Registrar();
         }*/
@@ -271,11 +271,13 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
             if (jdbcPersonDAO.userExiste(Integer.parseInt(et_Dni.getText()))) {
 
                 if (jdbcPersonDAO.registerSalida(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText()))) == false) {
-                    System.out.print(jdbcPersonDAO.horarioInicial(4));
-                    System.out.print(jdbcPersonDAO.horarioFinal(4));
+                    //Estos son valores null
+                    //NO SE ESTA SUBIENDO LOS DATOS  :v  Y ESO ES EL ERROR 
+                    System.out.print("Log1:" + jdbcPersonDAO.horarioInicial(Integer.parseInt(et_Dni.getText())));
+                    System.out.print("Log2:"+jdbcPersonDAO.horarioFinal(Integer.parseInt(et_Dni.getText())));
                     Registro registro = new Registro();
-                    String horarioTrabajo = jdbcPersonDAO.horarioInicial(4);
-                                      //System.out.print("hora entrada" + jdbcPersonDAO.horarioInicial(4));
+                    String horarioTrabajo = jdbcPersonDAO.horarioInicial(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                    //System.out.print("hora entrada" + jdbcPersonDAO.horarioInicial(4));
                     //DateTime HorarioTra = horarioTrabajo.getHoraEntrada();
                     DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
                     //String horaTrabajo = "08:00:00"; //hora de entrada
@@ -322,6 +324,22 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                     jdbcPersonDAO.closeConnection();
                     et_Dni.setText("");
                 } else {
+                    //VALIDAD LA HORA DE SALIDA
+                    System.out.print("Se marco la hora de salida");
+                    String horarioTrabajSalidad = jdbcPersonDAO.horarioFinal(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                    DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
+                    DateTime horaTrabajo = df.parseLocalTime(horarioTrabajSalidad).toDateTimeToday();
+
+                    Date dateActual = new Date();
+                    DateFormat hourFormat = new SimpleDateFormat("HH:mm:ss"); //hora actual
+                    String horaActual = hourFormat.format(dateActual);
+                    DateTime actual = df.parseLocalTime(horaActual).toDateTimeToday();
+                    
+                    if(!horaTrabajo.isBefore(actual)){
+                    }else{
+                    System.out.print("no se puede firmar");}
+                    
+
                     et_Dni.setText("");
                 }
 

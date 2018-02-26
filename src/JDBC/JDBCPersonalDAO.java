@@ -122,7 +122,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.last()) {
                 returnData = rs.getString("HoraEntrada");
-                System.out.print(returnData);
+                System.out.print("hora entrada:" + returnData+"\n");
             }
 
             preparedStatement.close();
