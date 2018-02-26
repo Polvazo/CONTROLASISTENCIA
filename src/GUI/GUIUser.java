@@ -103,6 +103,9 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
             }
         });
         et_Dni.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                et_DniKeyPressed(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 et_DniKeyTyped(evt);
             }
@@ -210,18 +213,28 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
     }//GEN-LAST:event_btn_ingresarActionPerformed
 
     private void et_DniKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_et_DniKeyTyped
+
         char enter = evt.getKeyChar();
-        if (!(Character.isDigit(enter))) {
+        if (!(Character.isDigit(enter)) || et_Dni.getText().length()>=8) {
             evt.consume();
         }        // TODO add your handling code here:
     }//GEN-LAST:event_et_DniKeyTyped
 
     private void btn_ingresarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btn_ingresarKeyPressed
+        
+       /* if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            System.out.println("se presiono la tecla Enter");
+            Registrar();
+        }*/
+    }//GEN-LAST:event_btn_ingresarKeyPressed
+
+    private void et_DniKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_et_DniKeyPressed
+        // TODO add your handling code here:
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             System.out.println("se presiono la tecla Enter");
             Registrar();
         }
-    }//GEN-LAST:event_btn_ingresarKeyPressed
+    }//GEN-LAST:event_et_DniKeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -308,6 +321,7 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
 
             } else {
                 System.out.println("no existe");
+                et_Dni.setText("");
                 jdbcPersonDAO.closeConnection();
             }
 
@@ -340,10 +354,6 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
         Thread ct = Thread.currentThread();
         while (ct == h1) {
             Calcular();
-            if(minutos.equals("51")){
-                System.out.print(minutos);
-            }
-            System.out.print(hora);
             lbhora.setText(hora + ":" + minutos + ":" + segundos + " " + amp);
             lbFecha.setText(day + "-" + mes + "-" + year);
             try {
