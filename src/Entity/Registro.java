@@ -10,7 +10,16 @@ public class Registro {
     private Timestamp HoraRegistroOut;
     private Integer Personal_idPersonal;
     private String Estado;
+    private Integer validacion;
 
+    public Integer getValidacion() {
+        return validacion;
+    }
+
+    public void setValidacion(Integer validacion) {
+        this.validacion = validacion;
+    }
+    
     public Integer getIdRegistro() {
         return idRegistro;
     }

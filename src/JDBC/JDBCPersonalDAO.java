@@ -10,7 +10,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import Entity.Registro;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.joda.time.format.ISODateTimeFormat.date;
 
 public class JDBCPersonalDAO implements PersonalDAO {
 
@@ -121,6 +129,64 @@ public class JDBCPersonalDAO implements PersonalDAO {
         }
 
         return returnData;
+    }
+
+    @Override
+    public List<Registro> registerSalida(Integer idpersonal) {
+
+        String QUERY = "select Personal_idPersonal, HoraRegistroIn,IFNULL(validacion,'no validacion') AS estado from registro where Personal_idPersonal=? and validacion=1";
+        List<Registro> personal = new LinkedList<Registro>();
+        DateFormat formatter;
+        formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
+            preparedStatement.setInt(1, idpersonal);
+            ResultSet rs = preparedStatement.executeQuery();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Registro registro = null;
+            while (rs.next()) {
+                registro = new Registro();
+                Date date = (Date) formatter.parse("HoraRegistroIn");
+                Timestamp time = new Timestamp(date.getTime());
+                registro.setHoraRegistroIn(time);
+                registro.setValidacion(Integer.parseInt(rs.getString("estado")));
+                personal.add(registro);
+            }
+            rs.close();
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ParseException ex) {
+            Logger.getLogger(JDBCPersonalDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return personal;
+
+    }
+
+    @Override
+    public Boolean userExiste(Integer dni) {
+        Boolean existe = false;
+        String QUERY = "SELECT idPersonal FROM personal WHERE DNI=?";
+        Personal person = new Personal();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY);
+            preparedStatement.setInt(1, dni);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.last()) {
+                //System.out.print("esto es " +Boolean.parseBoolean(rs.getString("idPersonal")));
+                //existe = Boolean.parseBoolean(rs.getString("idPersonal"));
+                existe = true;
+            }
+            preparedStatement.close();
+
+        } catch (SQLException e) {
+            System.out.print("paso por aca");
+            e.printStackTrace();
+        }
+        return existe;
     }
 
 }
