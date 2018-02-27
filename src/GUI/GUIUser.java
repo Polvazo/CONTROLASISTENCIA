@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import Entity.Registro;
 import JDBC.JDBCPersonalDAO;
+import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.DateFormat;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import rojerusan.RSNotifyFade;
 
 /**
  *
@@ -309,12 +311,15 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                     registro.setPersonal_idPersonal(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
                     if (actual.isBefore(horaTrabajo)) {
                         System.out.println("Llego temprano");
+                        new  rojerusan.RSNotifyFade("TEMPRANO", "Se registró su ingreso",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.SUCCESS).setVisible(true);
                         registro.setEstado("ASISTIÓ");
                     } else {
                         if (!actual.isBefore(horaTrabajo) && actual.isBefore(Tolerancia)) {
+                            new  rojerusan.RSNotifyFade("TARDANZA", "Se registró con tardanza",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.WARNING).setVisible(true);
                             System.out.println("Tardanza");
                             registro.setEstado("TARDANZA");
                         } else {
+                            new  rojerusan.RSNotifyFade("FALTA", "Se registró su falta",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.ERROR).setVisible(true);
                             System.out.println("FALTA");
                             registro.setEstado("FALTA");
                         }
@@ -337,8 +342,11 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                     
                     if (actual.isBefore(horaTrabajo)) {
                         System.out.print("no se puede firmar");
+                        new  rojerusan.RSNotifyFade("ADVERTENCIA", "No puede registrar su salida antes de la hora, por favor"
+                                + " intentelo mas tarde.",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.INFORMATION).setVisible(true);
                     } else {
                         jdbcPersonDAO.registrarSalidad(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                        new  rojerusan.RSNotifyFade("REGISTRO DE SALIDA", "Se registró su salida",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.SUCCESS).setVisible(true);
                     }
                     
                     et_Dni.setText("");
@@ -347,7 +355,8 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
             } else {
                 
                 System.out.println("no existe");
-                if (et_Dni.getText().length() < 8) {
+                if (et_Dni.getText().length() <= 8) {
+                    new  rojerusan.RSNotifyFade("ERROR", "Ingrese DNI correcto",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.ERROR).setVisible(true);
                     System.out.println("ingresar DNI correcto");
                 }
                 et_Dni.setText("");
