@@ -36,14 +36,14 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
     Integer day, mes, year;
     Calendar calendario;
     Thread h1;
-
+    
     public GUIUser() {
         initComponents();
         h1 = new Thread(this);
         h1.start();
         setLocationRelativeTo(null);//para centrar la ventana
         setVisible(true);
-
+        
     }
 
     /**
@@ -215,7 +215,7 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
     }//GEN-LAST:event_btn_ingresarActionPerformed
 
     private void et_DniKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_et_DniKeyTyped
-
+        
         char enter = evt.getKeyChar();
         if (!(Character.isDigit(enter)) || et_Dni.getText().length() >= 8) {
             evt.consume();
@@ -261,20 +261,20 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
         }
         return correcto;
     }
-
+    
     public void Registrar() {
-
+        
         JDBCPersonalDAO jdbcPersonDAO = new JDBCPersonalDAO();
         jdbcPersonDAO.getConnection();
         try {
-
+            
             if (jdbcPersonDAO.userExiste(Integer.parseInt(et_Dni.getText()))) {
-
+                
                 if (jdbcPersonDAO.registerSalida(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText()))) == false) {
                     //Estos son valores null
                     //NO SE ESTA SUBIENDO LOS DATOS  :v  Y ESO ES EL ERROR 
                     System.out.print("Log1:" + jdbcPersonDAO.horarioInicial(Integer.parseInt(et_Dni.getText())));
-                    System.out.print("Log2:"+jdbcPersonDAO.horarioFinal(Integer.parseInt(et_Dni.getText())));
+                    System.out.print("Log2:" + jdbcPersonDAO.horarioFinal(Integer.parseInt(et_Dni.getText())));
                     Registro registro = new Registro();
                     String horarioTrabajo = jdbcPersonDAO.horarioInicial(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
                     //System.out.print("hora entrada" + jdbcPersonDAO.horarioInicial(4));
@@ -293,15 +293,15 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
 
                     DateTime horaTrabajo = df.parseLocalTime(horarioTrabajo).toDateTimeToday();
                     DateTime Tolerancia = df.parseLocalTime(horarioTrabajo).toDateTimeToday().plusHours(1);
-
+                    
                     System.out.println(horaTrabajo);
-
+                    
                     System.out.println(jdbcPersonDAO.registerSalida(Integer.parseInt(et_Dni.getText())));
-
+                    
                     DateTime actual = df.parseLocalTime(horaActual).toDateTimeToday();
                     System.out.println(Tolerancia);
                     System.out.println(actual);
-
+                    
                     Calendar calendar = Calendar.getInstance();
                     System.out.println(calendar.getTime().getTime());
                     java.sql.Timestamp nuestroJavaTimestampObject = new java.sql.Timestamp(calendar.getTime().getTime());
@@ -319,7 +319,7 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                             registro.setEstado("FALTA");
                         }
                     }
-
+                    
                     jdbcPersonDAO.insert(registro);
                     jdbcPersonDAO.closeConnection();
                     et_Dni.setText("");
@@ -329,35 +329,40 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                     String horarioTrabajSalidad = jdbcPersonDAO.horarioFinal(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
                     DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
                     DateTime horaTrabajo = df.parseLocalTime(horarioTrabajSalidad).toDateTimeToday();
-
+                    
                     Date dateActual = new Date();
                     DateFormat hourFormat = new SimpleDateFormat("HH:mm:ss"); //hora actual
                     String horaActual = hourFormat.format(dateActual);
                     DateTime actual = df.parseLocalTime(horaActual).toDateTimeToday();
                     
-                    if(!horaTrabajo.isBefore(actual)){
-                    }else{
-                    System.out.print("no se puede firmar");}
+                    if (actual.isBefore(horaTrabajo)) {
+                        System.out.print("no se puede firmar");
+                    } else {
+                        jdbcPersonDAO.registrarSalidad(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                    }
                     
-
                     et_Dni.setText("");
                 }
-
+                
             } else {
+                
                 System.out.println("no existe");
+                if (et_Dni.getText().length() < 8) {
+                    System.out.println("ingresar DNI correcto");
+                }
                 et_Dni.setText("");
                 jdbcPersonDAO.closeConnection();
             }
-
+            
         } catch (Exception e) {
         }
-
+        
     }
-
+    
     public void Calcular() {
         Calendar calendario = new GregorianCalendar();
         Date horaActual = new Date();
-
+        
         calendario.setTime(horaActual);
         amp = calendario.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
         if (amp.equals("PM")) {
@@ -368,12 +373,12 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
         }
         minutos = calendario.get(Calendar.MINUTE) > 9 ? "" + calendario.get(Calendar.MINUTE) : "0" + calendario.get(Calendar.MINUTE);
         segundos = calendario.get(Calendar.SECOND) > 9 ? "" + calendario.get(Calendar.SECOND) : "0" + calendario.get(Calendar.SECOND);
-
+        
         day = calendario.get(Calendar.DAY_OF_MONTH);
         mes = calendario.get(Calendar.MONTH);
         year = calendario.get(Calendar.YEAR);
     }
-
+    
     public void run() {
         Thread ct = Thread.currentThread();
         while (ct == h1) {
@@ -384,8 +389,8 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
             }
-
+            
         }
     }
-
+    
 }

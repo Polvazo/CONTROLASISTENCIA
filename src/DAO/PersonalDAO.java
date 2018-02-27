@@ -1,9 +1,9 @@
 package DAO;
 
 
-import Entity.Area;
+
 import Entity.Registro;
-import java.util.List;
+
  
 public interface PersonalDAO {
     
@@ -14,5 +14,6 @@ public interface PersonalDAO {
   public String horarioFinal(Integer idPersonal);
   public Boolean registerSalida (Integer idpersonal);
   public Boolean userExiste(Integer dni);
+  public void registrarSalidad(Integer idpersonal);
     
 }

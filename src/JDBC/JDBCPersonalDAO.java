@@ -122,7 +122,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.last()) {
                 returnData = rs.getString("HoraEntrada");
-                System.out.print("hora entrada:" + returnData+"\n");
+                System.out.print("hora entrada:" + returnData + "\n");
             }
 
             preparedStatement.close();
@@ -147,7 +147,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
             ResultSet rs = preparedStatement.executeQuery();
             if (rs.last()) {
                 returnData = rs.getString("HoraSalida");
-               
+
             }
 
             preparedStatement.close();
@@ -177,22 +177,6 @@ public class JDBCPersonalDAO implements PersonalDAO {
                 //System.out.print("esto es " +Boolean.parseBoolean(rs.getString("idPersonal")));
                 //existe = Boolean.parseBoolean(rs.getString("idPersonal"));
                 existe = true;
-                System.out.print("paso por aca");
-                PreparedStatement preparedStatement1 = connection.prepareStatement(idRegistro);
-                preparedStatement1.setInt(1, idpersonal);
-                ResultSet rs1 = preparedStatement1.executeQuery();
-                while (rs1.next()) {
-                    idRegistroNumber = Integer.parseInt(rs1.getString("idRegistro"));
-                }
-                System.out.print(idRegistroNumber);
-                PreparedStatement preparedStatement2 = connection.prepareStatement(UPDATE);
-                preparedStatement2.setInt(1, idRegistroNumber);
-                preparedStatement2.executeUpdate();
-
-                rs1.close();
-                preparedStatement1.close();
-
-                preparedStatement2.close();
             }
             rs.close();
             preparedStatement.close();
@@ -230,6 +214,35 @@ public class JDBCPersonalDAO implements PersonalDAO {
             e.printStackTrace();
         }
         return existe;
+    }
+
+    @Override
+    public void registrarSalidad(Integer idpersonal) {
+        String idRegistro = "SELECT idRegistro from registro where Personal_idPersonal=? and validacion=1";
+        String UPDATE = "UPDATE registro SET validacion=2 WHERE idRegistro=?";
+        Integer idRegistroNumber = null;
+        try {
+
+            PreparedStatement preparedStatement1 = connection.prepareStatement(idRegistro);
+            preparedStatement1.setInt(1, idpersonal);
+            ResultSet rs1 = preparedStatement1.executeQuery();
+            while (rs1.next()) {
+                idRegistroNumber = Integer.parseInt(rs1.getString("idRegistro"));
+            }
+            System.out.print(idRegistroNumber);
+            PreparedStatement preparedStatement2 = connection.prepareStatement(UPDATE);
+            preparedStatement2.setInt(1, idRegistroNumber);
+            preparedStatement2.executeUpdate();
+
+            rs1.close();
+            preparedStatement1.close();
+
+            preparedStatement2.close();
+
+        } catch (SQLException e) {
+            System.out.print("paso por aca");
+            System.out.print("LA HORA NO PUEDE SER 24 DE LA NOCHE");
+        }
     }
 
 }
