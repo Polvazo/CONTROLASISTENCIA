@@ -304,13 +304,13 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
             
             if (jdbcPersonDAO.userExiste(Integer.parseInt(et_Dni.getText()))) {
                 
-                if (jdbcPersonDAO.registerSalida(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText()))) == false) {
+                if (jdbcPersonDAO.estadoValidacionSalida(jdbcPersonDAO.selectIdPersonal(Integer.parseInt(et_Dni.getText()))) == false) {
                     //Estos son valores null
                     //NO SE ESTA SUBIENDO LOS DATOS  :v  Y ESO ES EL ERROR 
-                    System.out.print("Log1:" + jdbcPersonDAO.horarioInicial(Integer.parseInt(et_Dni.getText())));
-                    System.out.print("Log2:" + jdbcPersonDAO.horarioFinal(Integer.parseInt(et_Dni.getText())));
+                    System.out.print("Log1:" + jdbcPersonDAO.horarioEntradaTrabajo(Integer.parseInt(et_Dni.getText())));
+                    System.out.print("Log2:" + jdbcPersonDAO.horarioTrabajoSalida(Integer.parseInt(et_Dni.getText())));
                     Registro registro = new Registro();
-                    String horarioTrabajo = jdbcPersonDAO.horarioInicial(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                    String horarioTrabajo = jdbcPersonDAO.horarioEntradaTrabajo(jdbcPersonDAO.selectIdPersonal(Integer.parseInt(et_Dni.getText())));
                     //System.out.print("hora entrada" + jdbcPersonDAO.horarioInicial(4));
                     //DateTime HorarioTra = horarioTrabajo.getHoraEntrada();
                    // DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
@@ -330,7 +330,7 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                     
                     System.out.println(horaTrabajo);
                     
-                    System.out.println(jdbcPersonDAO.registerSalida(Integer.parseInt(et_Dni.getText())));
+                    System.out.println(jdbcPersonDAO.estadoValidacionSalida(Integer.parseInt(et_Dni.getText())));
                     
                     DateTime actual = df.parseLocalTime(horaActual).toDateTimeToday();
                     System.out.println(Tolerancia);
@@ -340,7 +340,7 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                     System.out.println(calendar.getTime().getTime());
                     java.sql.Timestamp nuestroJavaTimestampObject = new java.sql.Timestamp(calendar.getTime().getTime());
                     registro.setHoraRegistroIn(nuestroJavaTimestampObject);
-                    registro.setPersonal_idPersonal(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                    registro.setPersonal_idPersonal(jdbcPersonDAO.selectIdPersonal(Integer.parseInt(et_Dni.getText())));
                     if (actual.isBefore(horaTrabajo)) {
                         System.out.println("Llego temprano");
                         new  rojerusan.RSNotifyFade("TEMPRANO", "Se registró su ingreso",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.SUCCESS).setVisible(true);
@@ -357,13 +357,13 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                         }
                     }
                     
-                    jdbcPersonDAO.insert(registro);
+                    jdbcPersonDAO.insertRegistro(registro);
                     jdbcPersonDAO.closeConnection();
                     et_Dni.setText("");
                 } else {
                     //VALIDAD LA HORA DE SALIDA
                     System.out.print("Se marco la hora de salida");
-                    String horarioTrabajSalidad = jdbcPersonDAO.horarioFinal(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                    String horarioTrabajSalidad = jdbcPersonDAO.horarioTrabajoSalida(jdbcPersonDAO.selectIdPersonal(Integer.parseInt(et_Dni.getText())));
                     //DateTimeFormatter df = DateTimeFormat.forPattern("HH:mm:ss");
                     DateTime horaTrabajo = df.parseLocalTime(horarioTrabajSalidad).toDateTimeToday();
                     
@@ -378,7 +378,7 @@ public class GUIUser extends javax.swing.JFrame implements Runnable {
                         new  rojerusan.RSNotifyFade("ADVERTENCIA", "No puede registrar su salida antes de la hora, por favor"
                                 + " intentelo mas tarde.",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.INFORMATION).setVisible(true);
                     } else {
-                        jdbcPersonDAO.registrarSalidad(jdbcPersonDAO.select(Integer.parseInt(et_Dni.getText())));
+                        jdbcPersonDAO.registrarSalidad(jdbcPersonDAO.selectIdPersonal(Integer.parseInt(et_Dni.getText())));
                         new  rojerusan.RSNotifyFade("REGISTRO DE SALIDA", "Se registró su salida",Color.white, Color.black, Color.black,1,RSNotifyFade.PositionNotify.BottomRight,RSNotifyFade.TypeNotify.SUCCESS).setVisible(true);
                     }
                     

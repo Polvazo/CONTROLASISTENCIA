@@ -10,7 +10,6 @@ import java.sql.SQLException;
 
 import Entity.Registro;
 
-
 public class JDBCPersonalDAO implements PersonalDAO {
 
     Connection connection = null;
@@ -37,7 +36,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
     }
 
     @Override
-    public void insert(Registro registro) {
+    public void insertRegistro(Registro registro) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bdproyectomate.registro (HoraRegistroIn,Personal_idPersonal,Estado) VALUES (?,?,?)");
             preparedStatement.setTimestamp(1, registro.getHoraRegistroIn());
@@ -63,7 +62,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
     }
 
     @Override
-    public Integer select(Integer dni) {
+    public Integer selectIdPersonal(Integer dni) {
         Integer returnData = null;
         String QUERY = "SELECT idPersonal FROM personal WHERE DNI=?";
         Personal person = new Personal();
@@ -86,22 +85,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
     }
 
     @Override
-    public void Salida(Registro registro) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO bdproyectomate.registro (HoraRegistroIn,Personal_idPersonal,Estado) VALUES (?,?,?)");
-            preparedStatement.setTimestamp(1, registro.getHoraRegistroIn());
-            preparedStatement.setInt(2, registro.getPersonal_idPersonal());
-            preparedStatement.setString(3, registro.getEstado());
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    public String horarioInicial(Integer idPersonal) {
+    public String horarioEntradaTrabajo(Integer idPersonal) {
         String returnData = null;
         String QUERY = "select HoraEntrada from bdproyectomate.area right outer join bdproyectomate.personal ON personal.Area_idArea=area.idArea where personal.idPersonal=?;";
         Personal person = new Personal();
@@ -125,7 +109,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
     }
 
     @Override
-    public String horarioFinal(Integer idPersonal) {
+    public String horarioTrabajoSalida(Integer idPersonal) {
         String returnData = null;
         String horaFinal = null;
         String QUERY = "select HoraSalida from bdproyectomate.area right outer join bdproyectomate.personal ON personal.Area_idArea=area.idArea where personal.idPersonal=?;";
@@ -150,7 +134,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
     }
 
     @Override
-    public Boolean registerSalida(Integer idpersonal) {
+    public Boolean estadoValidacionSalida(Integer idpersonal) {
 
         String QUERY = "select validacion from registro WHERE Personal_idPersonal=? and validacion=1";
         String idRegistro = "SELECT idRegistro from registro where Personal_idPersonal=? and validacion=1";
@@ -248,7 +232,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
             PreparedStatement preparedStatement2 = connection.prepareStatement(UPDATE);
             preparedStatement2.executeUpdate();
             preparedStatement2.close();
-            
+
             //DESACTIVA EL EDITOR
             PreparedStatement preparedStatement3 = connection.prepareStatement(Desactivar);
             preparedStatement3.executeUpdate();
