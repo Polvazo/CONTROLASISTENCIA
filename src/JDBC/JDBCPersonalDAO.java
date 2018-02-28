@@ -7,20 +7,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+
 import Entity.Registro;
-import Entity.Area;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.joda.time.DateTime;
-import static org.joda.time.format.ISODateTimeFormat.date;
+
 
 public class JDBCPersonalDAO implements PersonalDAO {
 
@@ -86,7 +75,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
             while (rs.next()) {
                 returnData = Integer.parseInt(rs.getString("idPersonal"));
             }
-
+            rs.close();
             preparedStatement.close();
 
         } catch (SQLException e) {
@@ -124,7 +113,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
                 returnData = rs.getString("HoraEntrada");
                 System.out.print("hora entrada:" + returnData + "\n");
             }
-
+            rs.close();
             preparedStatement.close();
 
         } catch (SQLException e) {
@@ -149,7 +138,7 @@ public class JDBCPersonalDAO implements PersonalDAO {
                 returnData = rs.getString("HoraSalida");
 
             }
-
+            rs.close();
             preparedStatement.close();
 
         } catch (SQLException e) {
@@ -243,6 +232,32 @@ public class JDBCPersonalDAO implements PersonalDAO {
             System.out.print("paso por aca");
             System.out.print("LA HORA NO PUEDE SER 24 DE LA NOCHE");
         }
+    }
+
+    @Override
+    public void updateSalida() {
+        String Activacion = "SET SQL_SAFE_UPDATES = 0;";
+        String UPDATE = "UPDATE registro SET Estado='FALTA, NO REGISTRO SALIDA', validacion=2 WHERE validacion = 1;";
+        String Desactivar = "SET SQL_SAFE_UPDATES = 1;";
+        try {
+            //ACTIVA EL EDITOR
+            PreparedStatement preparedStatement = connection.prepareStatement(Activacion);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+
+            PreparedStatement preparedStatement2 = connection.prepareStatement(UPDATE);
+            preparedStatement2.executeUpdate();
+            preparedStatement2.close();
+            
+            //DESACTIVA EL EDITOR
+            PreparedStatement preparedStatement3 = connection.prepareStatement(Desactivar);
+            preparedStatement3.executeUpdate();
+            preparedStatement3.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

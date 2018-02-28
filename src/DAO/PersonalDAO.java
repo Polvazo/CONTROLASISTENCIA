@@ -15,5 +15,6 @@ public interface PersonalDAO {
   public Boolean registerSalida (Integer idpersonal);
   public Boolean userExiste(Integer dni);
   public void registrarSalidad(Integer idpersonal);
+  public void updateSalida();
     
 }
